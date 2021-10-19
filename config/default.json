@@ -1,0 +1,5 @@
+{
+    "port": 5000,
+    "mongoUri": "mongodb+srv://Raximov:931897318Rd@cluster0.iggfq.mongodb.net/mern?retryWrites=true&w=majority",
+    "jwtSecret": "dilrozbek mern"
+}
