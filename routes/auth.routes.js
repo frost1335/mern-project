@@ -1,94 +1,89 @@
-const { Router } = require('express')
-const bcrypt = require('bcryptjs')
-const { check, validationResult } = require('express-validator')
-const jwt = require('jsonwebtoken')
-const User = require('../models/User')
-const router = Router()
-const config = require('config')
+const { Router } = require("express");
+const bcrypt = require("bcryptjs");
+const { check, validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const router = Router();
+const config = require("config");
 
 // /api/auth/register
 router.post(
-    '/register',
-    [
-        check('email', 'Invalid Email').isEmail(),
-        check('password', 'Minimum 6 charters on password').isLength({ min: 6 })
-    ],
-    async (req, res) => {
-        try {
-            const errors = validationResult(req)
+  "/register",
+  [
+    check("email", "Invalid Email").isEmail(),
+    check("password", "Minimum 6 charters on password").isLength({ min: 6 }),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
 
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    errors: errors.array(),
-                    message: 'Wrong info on registration !'
-                })
-            }
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          errors: errors.array(),
+          message: "Wrong info on registration !",
+        });
+      }
 
-            const { email, password } = req.body
+      const { email, password } = req.body;
 
-            const candidate = await User.findOne({ email })
+      const candidate = await User.findOne({ email });
 
-            if (candidate) {
-                return res.status(400).json({ message: 'This email is avaible !' })
-            }
+      if (candidate) {
+        return res.status(400).json({ message: "This email is avaible !" });
+      }
 
-            const hashedPassword = await bcrypt.hash(password, 12)
-            const user = new User({ email, password: hashedPassword })
-            await user.save()
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const user = new User({ email, password: hashedPassword });
+      await user.save();
 
-            res.status(201).json({ message: 'The user is created !' })
-        }
-        catch (e) {
-            res.status(500).json({ message: 'Somewhere is wrong !' })
-        }
+      res.status(201).json({ message: "The user is created !" });
+    } catch (e) {
+      res.status(500).json({ message: "Somewhere is wrong !" });
     }
-)
+  }
+);
 
 // /api/auth/login
 router.post(
-    '/login',
-    [
-        check('email', 'Write the trust email').normalizeEmail().isEmail(),
-        check('password', 'Write the password').exists()
-    ],
-    async (req, res) => {
-        try {
-            const errors = validationResult(req)
+  "/login",
+  [
+    check("email", "Write the trust email").normalizeEmail().isEmail(),
+    check("password", "Write the password").exists(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
 
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    errors: errors.array(),
-                    message: 'Wrong info on login !'
-                })
-            }
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          errors: errors.array(),
+          message: "Wrong info on login !",
+        });
+      }
 
-            const { email, password } = req.body
+      const { email, password } = req.body;
 
-            const user = await findOne({ email })
+      const user = await User.findOne({ email });
 
-            if (!user) {
-                return res.status(400).json({ message: 'User is not defined !' })
-            }
+      if (!user) {
+        return res.status(400).json({ message: "User is not defined !" });
+      }
 
-            const isMatch = await bcrypt.compare(password, user.password)
+      const isMatch = await bcrypt.compare(password, user.password);
 
-            if (!isMatch) {
-                return res.status(400).json({ message: 'Password is wrong try again' })
-            }
+      if (!isMatch) {
+        return res.status(400).json({ message: "Password is wrong try again" });
+      }
 
-            const token = jwt.sign(
-                { userId: user.id },
-                config.get('jwtSecret'),
-                { expiresIn: '10min' }
-            )
+      const token = jwt.sign({ userId: user.id }, config.get("jwtSecret"), {
+        expiresIn: "10min",
+      });
 
-            res.json({ token, userId: user.id })
-
-        }
-        catch (e) {
-            res.status(500).json({ message: 'Somewhere is wrong !' })
-        }
+      res.json({ token, userId: user.id });
+    } catch (e) {
+      res.status(500).json({ message: "Somewhere is wrong, try again !" });
     }
-)
+  }
+);
 
-module.exports = router
+module.exports = router;
