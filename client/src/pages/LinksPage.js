@@ -26,15 +26,5 @@ export const LinksPage = () => {
     return <Loader />;
   }
 
-  return(
-      <>
-        {!loading && <LinksList links={links}/>}
-      </>
-  )
-
-  return (
-    <div>
-      <h1>Links Page</h1>
-    </div>
-  );
+  return <>{!loading && <LinksList links={links} />}</>;
 };

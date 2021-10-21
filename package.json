@@ -5,9 +5,11 @@
   "main": "app.js",
   "scripts": {
     "dev": "node app.js",
-    "server": "nodemon app.js",
+    "server": "cross-env NODE_ENV=development nodemon app.js",
     "client": "npm run start --prefix client",
-    "start": "concurrently \"npm run server\" \"npm run client\""
+    "client:install": "npm install --prefix client",
+    "client:build": "npm run build --prefix client",
+    "start": "cross-env NODE_ENV=production concurrently \"npm run client:install\" \"npm run client:build\" \"npm run server\" \"npm run client\""
   },
   "keywords": [
     "mern"
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "concurrently": "^6.3.0",
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.13"
   }
 }
